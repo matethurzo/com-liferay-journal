@@ -372,9 +372,14 @@ public class JournalArticleLocalServiceImpl
 			displayDate, expirationDate, smallImage, smallImageURL,
 			smallImageFile, smallImageBytes, serviceContext);
 
-		validateReferences(
-			groupId, ddmStructureKey, ddmTemplateKey, layoutUuid, smallImage,
-			smallImageURL, smallImageBytes, 0, content);
+		boolean latest = GetterUtil.getBoolean(
+			serviceContext.getAttribute("latest"));
+
+		if (latest) {
+			validateReferences(
+				groupId, ddmStructureKey, ddmTemplateKey, layoutUuid,
+				smallImage, smallImageURL, smallImageBytes, 0, content);
+		}
 
 		serviceContext.setAttribute("articleId", articleId);
 
@@ -5422,10 +5427,15 @@ public class JournalArticleLocalServiceImpl
 			expirationDate, smallImage, smallImageURL, smallImageFile,
 			smallImageBytes, serviceContext);
 
-		validateReferences(
-			groupId, ddmStructureKey, ddmTemplateKey, layoutUuid, smallImage,
-			smallImageURL, smallImageBytes, latestArticle.getSmallImageId(),
-			content);
+		boolean latest = GetterUtil.getBoolean(
+			serviceContext.getAttribute("latest"));
+
+		if (latest) {
+			validateReferences(
+				groupId, ddmStructureKey, ddmTemplateKey, layoutUuid,
+				smallImage, smallImageURL, smallImageBytes,
+				latestArticle.getSmallImageId(), content);
+		}
 
 		if (addNewVersion) {
 			long id = counterLocalService.increment();
