@@ -36,6 +36,7 @@ import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.model.JournalFolderConstants;
 import com.liferay.journal.service.JournalArticleLocalService;
 import com.liferay.journal.service.JournalArticleResourceLocalService;
+import com.liferay.journal.util.impl.JournalUtil;
 import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -264,13 +265,7 @@ public class JournalArticleStagedModelDataHandler
 		articleElement.addAttribute(
 			"article-resource-uuid", article.getArticleResourceUuid());
 
-		JournalArticle latestArticle =
-			_journalArticleLocalService.fetchLatestArticle(
-				article.getResourcePrimKey());
-
-		if ((latestArticle != null) &&
-			(latestArticle.getId() == article.getId())) {
-
+		if (JournalUtil.isLatestArticle(article)) {
 			articleElement.addAttribute("latest", String.valueOf(true));
 		}
 
