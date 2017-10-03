@@ -372,7 +372,8 @@ public class JournalArticleLocalServiceImpl
 			user.getCompanyId(), groupId, classNameId, articleId, autoArticleId,
 			version, titleMap, content, ddmStructureKey, ddmTemplateKey,
 			displayDate, expirationDate, smallImage, smallImageURL,
-			smallImageFile, smallImageBytes, serviceContext);
+			smallImageFile, smallImageBytes, validateReferences,
+			serviceContext);
 
 		if (validateReferences) {
 			validateReferences(
@@ -5551,7 +5552,7 @@ public class JournalArticleLocalServiceImpl
 			user.getCompanyId(), groupId, latestArticle.getClassNameId(),
 			titleMap, content, ddmStructureKey, ddmTemplateKey, displayDate,
 			expirationDate, smallImage, smallImageURL, smallImageFile,
-			smallImageBytes, serviceContext);
+			smallImageBytes, validateReferences, serviceContext);
 
 		if (validateReferences) {
 			validateReferences(
@@ -8198,7 +8199,7 @@ public class JournalArticleLocalServiceImpl
 			String ddmStructureKey, String ddmTemplateKey, Date displayDate,
 			Date expirationDate, boolean smallImage, String smallImageURL,
 			File smallImageFile, byte[] smallImageBytes,
-			ServiceContext serviceContext)
+			boolean validateReferences, ServiceContext serviceContext)
 		throws PortalException {
 
 		Locale articleDefaultLocale = LocaleUtil.fromLanguageId(
@@ -8245,8 +8246,10 @@ public class JournalArticleLocalServiceImpl
 			classNameLocalService.getClassNameId(JournalArticle.class),
 			ddmStructureKey, true);
 
-		validateDDMStructureFields(
-			ddmStructure, classNameId, content, articleDefaultLocale);
+		if (validateReferences) {
+			validateDDMStructureFields(
+				ddmStructure, classNameId, content, articleDefaultLocale);
+		}
 
 		if (Validator.isNotNull(ddmTemplateKey)) {
 			DDMTemplate ddmTemplate = ddmTemplateLocalService.getTemplate(
@@ -8306,7 +8309,7 @@ public class JournalArticleLocalServiceImpl
 			String content, String ddmStructureKey, String ddmTemplateKey,
 			Date displayDate, Date expirationDate, boolean smallImage,
 			String smallImageURL, File smallImageFile, byte[] smallImageBytes,
-			ServiceContext serviceContext)
+			boolean validateReferences, ServiceContext serviceContext)
 		throws PortalException {
 
 		if (!autoArticleId) {
@@ -8333,7 +8336,8 @@ public class JournalArticleLocalServiceImpl
 		validate(
 			companyId, groupId, classNameId, titleMap, content, ddmStructureKey,
 			ddmTemplateKey, displayDate, expirationDate, smallImage,
-			smallImageURL, smallImageFile, smallImageBytes, serviceContext);
+			smallImageURL, smallImageFile, smallImageBytes, validateReferences,
+			serviceContext);
 	}
 
 	protected void validate(String articleId) throws PortalException {
