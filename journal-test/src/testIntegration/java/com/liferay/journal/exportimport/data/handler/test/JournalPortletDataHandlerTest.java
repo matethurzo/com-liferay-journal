@@ -19,14 +19,22 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.test.util.DDMStructureTestUtil;
 import com.liferay.dynamic.data.mapping.test.util.DDMTemplateTestUtil;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
+import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
+import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.journal.configuration.JournalServiceConfiguration;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.exportimport.data.handler.JournalPortletDataHandler;
 import com.liferay.journal.model.JournalArticle;
+import com.liferay.journal.model.JournalFeed;
 import com.liferay.journal.model.JournalFolder;
 import com.liferay.journal.service.JournalFolderLocalServiceUtil;
 import com.liferay.journal.test.util.JournalTestUtil;
+import com.liferay.portal.kernel.log.Log;
+import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.model.Group;
 import com.liferay.portal.kernel.model.Layout;
+import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.portlet.PortalPreferences;
 import com.liferay.portal.kernel.portlet.PortletPreferencesFactoryUtil;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
@@ -62,6 +70,10 @@ import org.junit.runner.RunWith;
 @Sync
 public class JournalPortletDataHandlerTest
 	extends BasePortletDataHandlerTestCase {
+
+	public static final String NAMESPACE = "journal";
+
+	public static final String SCHEMA_VERSION = "1.1.0";
 
 	@ClassRule
 	@Rule
@@ -187,9 +199,100 @@ public class JournalPortletDataHandlerTest
 	}
 
 	@Override
+	protected StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(DDMStructure.class, JournalArticle.class),
+			new StagedModelType(DDMTemplate.class, DDMStructure.class),
+			new StagedModelType(JournalArticle.class),
+			new StagedModelType(JournalArticle.class, DDMStructure.class),
+			new StagedModelType(JournalFeed.class),
+			new StagedModelType(JournalFolder.class)
+		};
+	}
+
+	@Override
+	protected PortletDataHandlerControl[] getExportControls() {
+		return new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(
+				NAMESPACE, "web-content", true, false,
+				new PortletDataHandlerControl[] {
+					new PortletDataHandlerBoolean(
+						NAMESPACE, "referenced-content"),
+					new PortletDataHandlerBoolean(
+						NAMESPACE, "version-history",
+						_isVersionHistoryByDefaultEnabled())
+				},
+				JournalArticle.class.getName()),
+			new PortletDataHandlerBoolean(
+				NAMESPACE, "structures", true, false, null,
+				DDMStructure.class.getName(), JournalArticle.class.getName()),
+			new PortletDataHandlerBoolean(
+				NAMESPACE, "templates", true, false, null,
+				DDMTemplate.class.getName(), DDMStructure.class.getName()),
+			new PortletDataHandlerBoolean(
+				NAMESPACE, "feeds", true, false, null,
+				JournalFeed.class.getName()),
+			new PortletDataHandlerBoolean(
+				NAMESPACE, "folders", true, false, null,
+				JournalFolder.class.getName())
+		};
+	}
+
+	@Override
 	protected String getPortletId() {
 		return JournalPortletKeys.JOURNAL;
 	}
+
+	@Override
+	protected String getSchemaVersion() {
+		return SCHEMA_VERSION;
+	}
+
+	@Override
+	protected boolean isDataLocalized() {
+		return true;
+	}
+
+	@Override
+	protected boolean isPublishToLiveByDefault() {
+		try {
+			JournalServiceConfiguration journalServiceConfiguration =
+				ConfigurationProviderUtil.getCompanyConfiguration(
+					JournalServiceConfiguration.class,
+					CompanyThreadLocal.getCompanyId());
+
+			return journalServiceConfiguration.publishToLiveByDefaultEnabled();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+
+		return true;
+	}
+
+	@Override
+	protected boolean isSupportsDataStrategyMirrorWithOverwriting() {
+		return false;
+	}
+
+	private boolean _isVersionHistoryByDefaultEnabled() {
+		try {
+			JournalServiceConfiguration journalServiceConfiguration =
+				ConfigurationProviderUtil.getCompanyConfiguration(
+					JournalServiceConfiguration.class,
+					CompanyThreadLocal.getCompanyId());
+
+			return journalServiceConfiguration.versionHistoryByDefaultEnabled();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+
+		return true;
+	}
+
+	private static final Log _log = LogFactoryUtil.getLog(
+		JournalPortletDataHandlerTest.class);
 
 	private String _originalPortalPreferencesXML;
 
