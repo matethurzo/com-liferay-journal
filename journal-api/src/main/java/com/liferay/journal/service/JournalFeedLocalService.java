@@ -116,6 +116,8 @@ public interface JournalFeedLocalService extends BaseLocalService,
 	public void deleteFeed(long groupId, java.lang.String feedId)
 		throws PortalException;
 
+	public void deleteFeeds(long groupId) throws PortalException;
+
 	/**
 	* Deletes the journal feed from the database. Also notifies the appropriate model listeners.
 	*
