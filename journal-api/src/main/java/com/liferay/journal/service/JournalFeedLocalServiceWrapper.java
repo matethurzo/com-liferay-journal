@@ -125,6 +125,12 @@ public class JournalFeedLocalServiceWrapper implements JournalFeedLocalService,
 		_journalFeedLocalService.deleteFeed(groupId, feedId);
 	}
 
+	@Override
+	public void deleteFeeds(long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		_journalFeedLocalService.deleteFeeds(groupId);
+	}
+
 	/**
 	* Deletes the journal feed from the database. Also notifies the appropriate model listeners.
 	*

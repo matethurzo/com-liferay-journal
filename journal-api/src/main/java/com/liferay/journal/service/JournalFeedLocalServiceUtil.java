@@ -125,6 +125,11 @@ public class JournalFeedLocalServiceUtil {
 		getService().deleteFeed(groupId, feedId);
 	}
 
+	public static void deleteFeeds(long groupId)
+		throws com.liferay.portal.kernel.exception.PortalException {
+		getService().deleteFeeds(groupId);
+	}
+
 	/**
 	* Deletes the journal feed from the database. Also notifies the appropriate model listeners.
 	*
