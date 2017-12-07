@@ -187,6 +187,9 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 		_journalFolderLocalService.deleteFolders(
 			portletDataContext.getGroupId());
 
+		_journalFeedLocalService.deleteFeeds(
+			portletDataContext.getScopeGroupId());
+
 		_ddmTemplateLocalService.deleteTemplates(
 			portletDataContext.getScopeGroupId(),
 			_portal.getClassNameId(DDMStructure.class));
