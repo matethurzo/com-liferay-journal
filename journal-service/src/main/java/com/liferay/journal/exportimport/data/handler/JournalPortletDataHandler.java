@@ -108,6 +108,11 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 	public static final String SCHEMA_VERSION = "1.1.0";
 
 	@Override
+	public String getPortletId() {
+		return JournalPortletKeys.JOURNAL;
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
 	}
