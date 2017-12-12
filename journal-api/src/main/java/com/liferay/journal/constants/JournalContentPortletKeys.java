@@ -12,21 +12,14 @@
  * details.
  */
 
-package com.liferay.journal.content.web.internal.upgrade.v1_0_0;
-
-import com.liferay.journal.constants.JournalContentPortletKeys;
-import com.liferay.portal.kernel.upgrade.BaseUpgradePortletId;
+package com.liferay.journal.constants;
 
 /**
- * @author Julio Camarero
+ * @author Eudaldo Alonso
  */
-public class UpgradePortletId extends BaseUpgradePortletId {
+public class JournalContentPortletKeys {
 
-	@Override
-	protected String[][] getRenamePortletIdsArray() {
-		return new String[][] {
-			new String[] {"56", JournalContentPortletKeys.JOURNAL_CONTENT}
-		};
-	}
+	public static final String JOURNAL_CONTENT =
+		"com_liferay_journal_content_web_portlet_JournalContentPortlet";
 
 }
