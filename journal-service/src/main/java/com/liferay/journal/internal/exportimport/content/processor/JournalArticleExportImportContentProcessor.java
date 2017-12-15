@@ -254,7 +254,7 @@ public class JournalArticleExportImportContentProcessor
 
 				if (journalArticle == null) {
 					if (_log.isInfoEnabled()) {
-						StringBundler messageSB = new StringBundler();
+						StringBundler messageSB = new StringBundler(7);
 
 						messageSB.append("Staged model with class name ");
 						messageSB.append(stagedModel.getModelClassName());

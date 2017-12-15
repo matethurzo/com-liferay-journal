@@ -12,14 +12,31 @@
  * details.
  */
 
-package com.liferay.journal.content.web.constants;
+package com.liferay.journal.exception;
+
+import aQute.bnd.annotation.ProviderType;
+
+import com.liferay.portal.kernel.exception.PortalException;
 
 /**
- * @author Eudaldo Alonso
+ * @author Brian Wing Shun Chan
  */
-public class JournalContentPortletKeys {
+@ProviderType
+public class ArticleFriendlyURLException extends PortalException {
 
-	public static final String JOURNAL_CONTENT =
-		"com_liferay_journal_content_web_portlet_JournalContentPortlet";
+	public ArticleFriendlyURLException() {
+	}
+
+	public ArticleFriendlyURLException(String msg) {
+		super(msg);
+	}
+
+	public ArticleFriendlyURLException(String msg, Throwable cause) {
+		super(msg, cause);
+	}
+
+	public ArticleFriendlyURLException(Throwable cause) {
+		super(cause);
+	}
 
 }

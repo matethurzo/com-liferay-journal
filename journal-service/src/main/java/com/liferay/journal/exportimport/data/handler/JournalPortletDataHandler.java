@@ -18,14 +18,19 @@ import com.liferay.dynamic.data.mapping.model.DDMStructure;
 import com.liferay.dynamic.data.mapping.model.DDMTemplate;
 import com.liferay.dynamic.data.mapping.service.DDMStructureLocalService;
 import com.liferay.dynamic.data.mapping.service.DDMTemplateLocalService;
-import com.liferay.exportimport.kernel.lar.BasePortletDataHandler;
+import com.liferay.exportimport.exception.handler.ExceptionHandlerHelper;
+import com.liferay.exportimport.kernel.lar.ManifestSummary;
 import com.liferay.exportimport.kernel.lar.PortletDataContext;
+import com.liferay.exportimport.kernel.lar.PortletDataException;
 import com.liferay.exportimport.kernel.lar.PortletDataHandler;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerBoolean;
 import com.liferay.exportimport.kernel.lar.PortletDataHandlerControl;
 import com.liferay.exportimport.kernel.lar.StagedModelDataHandlerUtil;
 import com.liferay.exportimport.kernel.lar.StagedModelType;
+import com.liferay.exportimport.portlet.data.handler.helper.PortletDataHandlerControlHelper;
+import com.liferay.exportimport.portlet.data.handler.helper.PortletDataHandlerHelper;
 import com.liferay.journal.configuration.JournalServiceConfiguration;
+import com.liferay.journal.constants.JournalConstants;
 import com.liferay.journal.constants.JournalPortletKeys;
 import com.liferay.journal.model.JournalArticle;
 import com.liferay.journal.model.JournalFeed;
@@ -46,10 +51,12 @@ import com.liferay.portal.kernel.dao.orm.PropertyFactoryUtil;
 import com.liferay.portal.kernel.dao.orm.RestrictionsFactoryUtil;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
+import com.liferay.portal.kernel.model.Portlet;
 import com.liferay.portal.kernel.module.configuration.ConfigurationProviderUtil;
 import com.liferay.portal.kernel.module.framework.ModuleServiceLifecycle;
 import com.liferay.portal.kernel.security.auth.CompanyThreadLocal;
 import com.liferay.portal.kernel.util.Portal;
+import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.xml.Element;
 
@@ -101,15 +108,235 @@ import org.osgi.service.component.annotations.Reference;
 	property = {"javax.portlet.name=" + JournalPortletKeys.JOURNAL},
 	service = PortletDataHandler.class
 )
-public class JournalPortletDataHandler extends BasePortletDataHandler {
+public class JournalPortletDataHandler implements PortletDataHandler {
 
 	public static final String NAMESPACE = "journal";
 
 	public static final String SCHEMA_VERSION = "1.1.0";
 
 	@Override
+	public PortletPreferences addDefaultData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		long startTime = _portletDataHandlerHelper.doBeforeAddDefaultData(
+			portletId);
+
+		try {
+			return doAddDefaultData(
+				portletDataContext, portletId, portletPreferences);
+		}
+		catch (PortletDataException pde) {
+			throw pde;
+		}
+		catch (Exception e) {
+			throw new PortletDataException(e);
+		}
+		finally {
+			_portletDataHandlerHelper.doAfterAddDefaultData(
+				portletId, startTime);
+		}
+	}
+
+	@Override
+	public PortletPreferences deleteData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		long startTime = _portletDataHandlerHelper.doBeforeDelete(portletId);
+
+		try {
+			return doDeleteData(
+				portletDataContext, portletId, portletPreferences);
+		}
+		catch (Exception e) {
+			throw _exceptionHandlerHelper.handleException(
+				e, PortletDataException.DELETE_PORTLET_DATA, portletId);
+		}
+		finally {
+			_portletDataHandlerHelper.doAfterDelete(portletId, startTime);
+		}
+	}
+
+	@Override
+	public String exportData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		Element rootElement = null;
+
+		long startTime = _portletDataHandlerHelper.doBeforeExport(
+			portletDataContext, portletId, rootElement,
+			getDeletionSystemEventStagedModelTypes(), getExportControls(),
+			portletPreferences);
+
+		try {
+			return doExportData(
+				portletDataContext, portletId, portletPreferences);
+		}
+		catch (Exception e) {
+			throw _exceptionHandlerHelper.handleException(
+				e, PortletDataException.EXPORT_PORTLET_DATA, portletId);
+		}
+		finally {
+			_portletDataHandlerHelper.doAfterExport(
+				portletDataContext, rootElement, startTime);
+		}
+	}
+
+	@Override
+	public String[] getDataPortletPreferences() {
+		return StringPool.EMPTY_ARRAY;
+	}
+
+	@Override
+	public StagedModelType[] getDeletionSystemEventStagedModelTypes() {
+		return new StagedModelType[] {
+			new StagedModelType(DDMStructure.class, JournalArticle.class),
+			new StagedModelType(DDMTemplate.class, DDMStructure.class),
+			new StagedModelType(JournalArticle.class),
+			new StagedModelType(JournalArticle.class, DDMStructure.class),
+			new StagedModelType(JournalFeed.class),
+			new StagedModelType(JournalFolder.class)
+		};
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getExportConfigurationControls(
+			long companyId, long groupId, Portlet portlet,
+			boolean privateLayout)
+		throws Exception {
+
+		return _portletDataHandlerControlHelper.getExportConfigurationControls(
+			companyId, groupId, portlet, isDisplayPortlet(),
+			getExportControls(), -1, privateLayout);
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getExportConfigurationControls(
+			long companyId, long groupId, Portlet portlet, long plid,
+			boolean privateLayout)
+		throws Exception {
+
+		return _portletDataHandlerControlHelper.getExportConfigurationControls(
+			companyId, groupId, portlet, isDisplayPortlet(),
+			getExportControls(), plid, privateLayout);
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getExportControls() {
+		return new PortletDataHandlerControl[] {
+			new PortletDataHandlerBoolean(
+				NAMESPACE, "web-content", true, false,
+				new PortletDataHandlerControl[] {
+					new PortletDataHandlerBoolean(
+						NAMESPACE, "referenced-content"),
+					new PortletDataHandlerBoolean(
+						NAMESPACE, "version-history",
+						_isVersionHistoryByDefaultEnabled())
+				},
+				JournalArticle.class.getName()),
+			new PortletDataHandlerBoolean(
+				NAMESPACE, "structures", true, false, null,
+				DDMStructure.class.getName(), JournalArticle.class.getName()),
+			new PortletDataHandlerBoolean(
+				NAMESPACE, "templates", true, false, null,
+				DDMTemplate.class.getName(), DDMStructure.class.getName()),
+			new PortletDataHandlerBoolean(
+				NAMESPACE, "feeds", true, false, null,
+				JournalFeed.class.getName()),
+			new PortletDataHandlerBoolean(
+				NAMESPACE, "folders", true, false, null,
+				JournalFolder.class.getName())
+		};
+	}
+
+	@Override
+	public long getExportModelCount(ManifestSummary manifestSummary) {
+		return _portletDataHandlerHelper.getExportModelCount(
+			manifestSummary, getExportControls());
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getImportConfigurationControls(
+		Portlet portlet, ManifestSummary manifestSummary) {
+
+		return _portletDataHandlerControlHelper.getImportConfigurationControls(
+			portlet, manifestSummary, isDisplayPortlet(), getExportControls());
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getImportConfigurationControls(
+		String[] configurationPortletOptions) {
+
+		return _portletDataHandlerControlHelper.getImportConfigurationControls(
+			configurationPortletOptions, isDisplayPortlet(),
+			getExportControls());
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getImportControls() {
+		return getExportControls();
+	}
+
+	@Override
+	public String getPortletId() {
+		return JournalPortletKeys.JOURNAL;
+	}
+
+	@Override
+	public int getRank() {
+		return 100;
+	}
+
+	@Override
 	public String getSchemaVersion() {
 		return SCHEMA_VERSION;
+	}
+
+	@Override
+	public String getServiceName() {
+		return null;
+	}
+
+	@Override
+	public PortletDataHandlerControl[] getStagingControls() {
+		return getExportControls();
+	}
+
+	@Override
+	public PortletPreferences importData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences, String data)
+		throws PortletDataException {
+
+		long startTime = 0;
+		Element rootElement = null;
+
+		try {
+			startTime = _portletDataHandlerHelper.doBeforeImport(
+				portletDataContext, portletId, rootElement, data);
+
+			return doImportData(
+				portletDataContext, portletId, portletPreferences, data);
+		}
+		catch (Exception e) {
+			_log.error(e.getMessage(), e);
+			throw _exceptionHandlerHelper.handleException(
+				e, PortletDataException.IMPORT_PORTLET_DATA, portletId);
+		}
+		finally {
+			_portletDataHandlerHelper.doAfterImport(
+				portletDataContext, rootElement, startTime);
+		}
+	}
+
+	@Override
+	public boolean isDataLocalized() {
+		return true;
 	}
 
 	@Override
@@ -134,42 +361,81 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 		return false;
 	}
 
-	@Activate
-	protected void activate() {
-		setDataLocalized(true);
-		setDeletionSystemEventStagedModelTypes(
-			new StagedModelType(DDMStructure.class, JournalArticle.class),
-			new StagedModelType(DDMTemplate.class, DDMStructure.class),
-			new StagedModelType(JournalArticle.class),
-			new StagedModelType(JournalArticle.class, DDMStructure.class),
-			new StagedModelType(JournalFeed.class),
-			new StagedModelType(JournalFolder.class));
-		setExportControls(
-			new PortletDataHandlerBoolean(
-				NAMESPACE, "web-content", true, false,
-				new PortletDataHandlerControl[] {
-					new PortletDataHandlerBoolean(
-						NAMESPACE, "referenced-content"),
-					new PortletDataHandlerBoolean(
-						NAMESPACE, "version-history",
-						isPublishToLiveByDefault())
-				},
-				JournalArticle.class.getName()),
-			new PortletDataHandlerBoolean(
-				NAMESPACE, "structures", true, false, null,
-				DDMStructure.class.getName(), JournalArticle.class.getName()),
-			new PortletDataHandlerBoolean(
-				NAMESPACE, "templates", true, false, null,
-				DDMTemplate.class.getName(), DDMStructure.class.getName()),
-			new PortletDataHandlerBoolean(
-				NAMESPACE, "feeds", true, false, null,
-				JournalFeed.class.getName()),
-			new PortletDataHandlerBoolean(
-				NAMESPACE, "folders", true, false, null,
-				JournalFolder.class.getName()));
+	@Override
+	public void prepareManifestSummary(PortletDataContext portletDataContext)
+		throws PortletDataException {
+
+		prepareManifestSummary(portletDataContext, null);
 	}
 
 	@Override
+	public void prepareManifestSummary(
+			PortletDataContext portletDataContext,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		try {
+			doPrepareManifestSummary(portletDataContext, portletPreferences);
+		}
+		catch (Exception e) {
+			throw _exceptionHandlerHelper.handleException(
+				e, PortletDataException.PREPARE_MANIFEST_SUMMARY,
+				portletDataContext.getPortletId());
+		}
+	}
+
+	/**
+	 * @deprecated As of 4.0.0
+	 */
+	@Deprecated
+	@Override
+	public PortletPreferences processExportPortletPreferences(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		return null;
+	}
+
+	/**
+	 * @deprecated As of 4.0.0
+	 */
+	@Deprecated
+	@Override
+	public PortletPreferences processImportPortletPreferences(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws PortletDataException {
+
+		return null;
+	}
+
+	@Override
+	public void setPortletId(String portletId) {
+	}
+
+	@Override
+	public void setRank(int rank) {
+	}
+
+	@Override
+	public boolean validateSchemaVersion(String schemaVersion) {
+		return _portletDataHandlerHelper.validateSchemaVersion(
+			schemaVersion, getSchemaVersion());
+	}
+
+	@Activate
+	protected void activate() {
+	}
+
+	protected PortletPreferences doAddDefaultData(
+			PortletDataContext portletDataContext, String portletId,
+			PortletPreferences portletPreferences)
+		throws Exception {
+
+		return portletPreferences;
+	}
+
 	protected PortletPreferences doDeleteData(
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
@@ -187,6 +453,9 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 		_journalFolderLocalService.deleteFolders(
 			portletDataContext.getGroupId());
 
+		_journalFeedLocalService.deleteFeeds(
+			portletDataContext.getScopeGroupId());
+
 		_ddmTemplateLocalService.deleteTemplates(
 			portletDataContext.getScopeGroupId(),
 			_portal.getClassNameId(DDMStructure.class));
@@ -198,7 +467,6 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 		return portletPreferences;
 	}
 
-	@Override
 	protected String doExportData(
 			final PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences)
@@ -207,7 +475,7 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 		portletDataContext.addPortletPermissions(
 			JournalPermission.RESOURCE_NAME);
 
-		Element rootElement = addExportDataRootElement(portletDataContext);
+		Element rootElement = portletDataContext.addExportDataRootElement();
 
 		rootElement.addAttribute(
 			"group-id", String.valueOf(portletDataContext.getScopeGroupId()));
@@ -258,10 +526,9 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 			articleActionableDynamicQuery.performActions();
 		}
 
-		return getExportDataRootElementString(rootElement);
+		return portletDataContext.getExportDataRootElementString();
 	}
 
-	@Override
 	protected PortletPreferences doImportData(
 			PortletDataContext portletDataContext, String portletId,
 			PortletPreferences portletPreferences, String data)
@@ -351,7 +618,6 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 		return portletPreferences;
 	}
 
-	@Override
 	protected void doPrepareManifestSummary(
 			PortletDataContext portletDataContext,
 			PortletPreferences portletPreferences)
@@ -617,11 +883,31 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 		ModuleServiceLifecycle moduleServiceLifecycle) {
 	}
 
+	private boolean _isVersionHistoryByDefaultEnabled() {
+		try {
+			JournalServiceConfiguration journalServiceConfiguration =
+				ConfigurationProviderUtil.getCompanyConfiguration(
+					JournalServiceConfiguration.class,
+					CompanyThreadLocal.getCompanyId());
+
+			return journalServiceConfiguration.versionHistoryByDefaultEnabled();
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
+
+		return true;
+	}
+
 	private static final Log _log = LogFactoryUtil.getLog(
 		JournalPortletDataHandler.class);
 
 	private DDMStructureLocalService _ddmStructureLocalService;
 	private DDMTemplateLocalService _ddmTemplateLocalService;
+
+	@Reference
+	private ExceptionHandlerHelper _exceptionHandlerHelper;
+
 	private JournalArticleLocalService _journalArticleLocalService;
 	private JournalArticleStagedModelDataHandler
 		_journalArticleStagedModelDataHandler;
@@ -631,5 +917,11 @@ public class JournalPortletDataHandler extends BasePortletDataHandler {
 
 	@Reference
 	private Portal _portal;
+
+	@Reference
+	private PortletDataHandlerControlHelper _portletDataHandlerControlHelper;
+
+	@Reference
+	private PortletDataHandlerHelper _portletDataHandlerHelper;
 
 }
