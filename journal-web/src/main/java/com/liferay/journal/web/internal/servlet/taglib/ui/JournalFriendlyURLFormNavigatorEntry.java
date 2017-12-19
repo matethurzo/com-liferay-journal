@@ -14,8 +14,10 @@
 
 package com.liferay.journal.web.internal.servlet.taglib.ui;
 
-import com.liferay.item.selector.ItemSelectorView;
+import com.liferay.journal.model.JournalArticle;
+import com.liferay.portal.kernel.model.User;
 import com.liferay.portal.kernel.servlet.taglib.ui.FormNavigatorEntry;
+import com.liferay.portal.kernel.util.Validator;
 
 import javax.servlet.ServletContext;
 
@@ -23,28 +25,23 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
 /**
- * @author Eudaldo Alonso
+ * @author Pavel Savinov
  */
 @Component(
-	property = {"form.navigator.entry.order:Integer=40"},
+	property = {"form.navigator.entry.order:Integer=50"},
 	service = FormNavigatorEntry.class
 )
-public class JournalDisplayPageFormNavigatorEntry
+public class JournalFriendlyURLFormNavigatorEntry
 	extends BaseJournalFormNavigatorEntry {
 
 	@Override
 	public String getKey() {
-		return "display-page";
+		return "friendly-url";
 	}
 
-	@Reference(target = "(view=private)", unbind = "-")
-	public void setPrivateLayoutsItemSelectorView(
-		ItemSelectorView itemSelectorView) {
-	}
-
-	@Reference(target = "(view=public)", unbind = "-")
-	public void setPublicLayoutsItemSelectorView(
-		ItemSelectorView itemSelectorView) {
+	@Override
+	public boolean isVisible(User user, JournalArticle article) {
+		return Validator.isNotNull(article);
 	}
 
 	@Override
@@ -57,7 +54,7 @@ public class JournalDisplayPageFormNavigatorEntry
 
 	@Override
 	protected String getJspPath() {
-		return "/article/display_page.jsp";
+		return "/article/friendly_url.jsp";
 	}
 
 }
