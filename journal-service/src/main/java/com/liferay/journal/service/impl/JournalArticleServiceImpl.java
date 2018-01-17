@@ -162,7 +162,7 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 			expirationDateHour, expirationDateMinute, neverExpire,
 			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,
 			reviewDateMinute, neverReview, indexable, smallImage, smallImageURL,
-			smallFile, images, articleURL, true, serviceContext);
+			smallFile, images, articleURL, serviceContext);
 	}
 
 	/**
@@ -2321,7 +2321,7 @@ public class JournalArticleServiceImpl extends JournalArticleServiceBaseImpl {
 			expirationDateHour, expirationDateMinute, neverExpire,
 			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,
 			reviewDateMinute, neverReview, indexable, smallImage, smallImageURL,
-			smallFile, images, articleURL, true, serviceContext);
+			smallFile, images, articleURL, serviceContext);
 	}
 
 	/**
