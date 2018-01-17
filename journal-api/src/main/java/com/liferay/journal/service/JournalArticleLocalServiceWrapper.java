@@ -122,8 +122,8 @@ public class JournalArticleLocalServiceWrapper
 	* @param smallImageFile the web content article's small image file
 	* @param images the web content's images
 	* @param articleURL the web content article's accessible URL
-	* @param latestVersion whether the article references and structure fields
-	are validated or not, as it is needed for the latest version only
+	* @param validate whether the article references and structure fields
+	are validated or not
 	* @param serviceContext the service context to be applied. Can set the
 	UUID, creation date, modification date, expando bridge
 	attributes, guest permissions, group permissions, asset category
@@ -150,7 +150,7 @@ public class JournalArticleLocalServiceWrapper
 		boolean smallImage, java.lang.String smallImageURL,
 		java.io.File smallImageFile,
 		java.util.Map<java.lang.String, byte[]> images,
-		java.lang.String articleURL, boolean latestVersion,
+		java.lang.String articleURL, boolean validate,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.addArticle(userId, groupId,
@@ -162,7 +162,7 @@ public class JournalArticleLocalServiceWrapper
 			expirationDateHour, expirationDateMinute, neverExpire,
 			reviewDateMonth, reviewDateDay, reviewDateYear, reviewDateHour,
 			reviewDateMinute, neverReview, indexable, smallImage,
-			smallImageURL, smallImageFile, images, articleURL, latestVersion,
+			smallImageURL, smallImageFile, images, articleURL, validate,
 			serviceContext);
 	}
 
@@ -252,8 +252,8 @@ public class JournalArticleLocalServiceWrapper
 	* @param smallImageFile the web content article's small image file
 	* @param images the web content's images
 	* @param articleURL the web content article's accessible URL
-	* @param latestVersion whether the article references and structure fields
-	are validated or not, as it is needed for the latest version only
+	* @param validate whether the article references and structure fields
+	are validated or not
 	* @param serviceContext the service context to be applied. Can set the
 	UUID, creation date, modification date, expando bridge
 	attributes, guest permissions, group permissions, asset category
@@ -279,7 +279,7 @@ public class JournalArticleLocalServiceWrapper
 		boolean smallImage, java.lang.String smallImageURL,
 		java.io.File smallImageFile,
 		java.util.Map<java.lang.String, byte[]> images,
-		java.lang.String articleURL, boolean latestVersion,
+		java.lang.String articleURL, boolean validate,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.addArticle(userId, groupId,
@@ -291,7 +291,7 @@ public class JournalArticleLocalServiceWrapper
 			expirationDateMinute, neverExpire, reviewDateMonth, reviewDateDay,
 			reviewDateYear, reviewDateHour, reviewDateMinute, neverReview,
 			indexable, smallImage, smallImageURL, smallImageFile, images,
-			articleURL, latestVersion, serviceContext);
+			articleURL, validate, serviceContext);
 	}
 
 	/**
@@ -3947,8 +3947,8 @@ public class JournalArticleLocalServiceWrapper
 	* @param images the web content's images (optionally <code>null</code>)
 	* @param articleURL the web content article's accessible URL (optionally
 	<code>null</code>)
-	* @param latestVersion whether the article references and structure fields
-	are validated or not, as it is needed for the latest version only
+	* @param validate whether the article references and structure fields
+	are validated or not
 	* @param serviceContext the service context to be applied. Can set the
 	modification date, expando bridge attributes, asset category IDs,
 	asset tag names, asset link entry IDs, asset priority, workflow
@@ -3978,7 +3978,7 @@ public class JournalArticleLocalServiceWrapper
 		boolean smallImage, java.lang.String smallImageURL,
 		java.io.File smallImageFile,
 		java.util.Map<java.lang.String, byte[]> images,
-		java.lang.String articleURL, boolean latestVersion,
+		java.lang.String articleURL, boolean validate,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.updateArticle(userId, groupId,
@@ -3990,7 +3990,7 @@ public class JournalArticleLocalServiceWrapper
 			expirationDateMinute, neverExpire, reviewDateMonth, reviewDateDay,
 			reviewDateYear, reviewDateHour, reviewDateMinute, neverReview,
 			indexable, smallImage, smallImageURL, smallImageFile, images,
-			articleURL, latestVersion, serviceContext);
+			articleURL, validate, serviceContext);
 	}
 
 	/**
@@ -4108,7 +4108,7 @@ public class JournalArticleLocalServiceWrapper
 	* @param images the web content's images (optionally <code>null</code>)
 	* @param articleURL the web content article's accessible URL (optionally
 	<code>null</code>)
-	* @param validateReferences whether the article references are validated
+	* @param validate whether the article references are validated
 	or not
 	* @param serviceContext the service context to be applied. Can set the
 	modification date, expando bridge attributes, asset category IDs,
@@ -4138,7 +4138,7 @@ public class JournalArticleLocalServiceWrapper
 		boolean smallImage, java.lang.String smallImageURL,
 		java.io.File smallImageFile,
 		java.util.Map<java.lang.String, byte[]> images,
-		java.lang.String articleURL, boolean validateReferences,
+		java.lang.String articleURL, boolean validate,
 		com.liferay.portal.kernel.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException {
 		return _journalArticleLocalService.updateArticle(userId, groupId,
@@ -4150,7 +4150,7 @@ public class JournalArticleLocalServiceWrapper
 			neverExpire, reviewDateMonth, reviewDateDay, reviewDateYear,
 			reviewDateHour, reviewDateMinute, neverReview, indexable,
 			smallImage, smallImageURL, smallImageFile, images, articleURL,
-			validateReferences, serviceContext);
+			validate, serviceContext);
 	}
 
 	/**
