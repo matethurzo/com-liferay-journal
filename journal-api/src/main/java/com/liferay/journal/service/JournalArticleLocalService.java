@@ -169,8 +169,8 @@ public interface JournalArticleLocalService extends BaseLocalService,
 	* @param smallImageFile the web content article's small image file
 	* @param images the web content's images
 	* @param articleURL the web content article's accessible URL
-	* @param latestVersion whether the article references and structure fields
-	are validated or not, as it is needed for the latest version only
+	* @param validate whether the article references and structure fields
+	are validated or not
 	* @param serviceContext the service context to be applied. Can set the
 	UUID, creation date, modification date, expando bridge
 	attributes, guest permissions, group permissions, asset category
@@ -195,7 +195,7 @@ public interface JournalArticleLocalService extends BaseLocalService,
 		int reviewDateHour, int reviewDateMinute, boolean neverReview,
 		boolean indexable, boolean smallImage, java.lang.String smallImageURL,
 		File smallImageFile, Map<java.lang.String, byte[]> images,
-		java.lang.String articleURL, boolean latestVersion,
+		java.lang.String articleURL, boolean validate,
 		ServiceContext serviceContext) throws PortalException;
 
 	/**
@@ -284,8 +284,8 @@ public interface JournalArticleLocalService extends BaseLocalService,
 	* @param smallImageFile the web content article's small image file
 	* @param images the web content's images
 	* @param articleURL the web content article's accessible URL
-	* @param latestVersion whether the article references and structure fields
-	are validated or not, as it is needed for the latest version only
+	* @param validate whether the article references and structure fields
+	are validated or not
 	* @param serviceContext the service context to be applied. Can set the
 	UUID, creation date, modification date, expando bridge
 	attributes, guest permissions, group permissions, asset category
@@ -308,7 +308,7 @@ public interface JournalArticleLocalService extends BaseLocalService,
 		int reviewDateHour, int reviewDateMinute, boolean neverReview,
 		boolean indexable, boolean smallImage, java.lang.String smallImageURL,
 		File smallImageFile, Map<java.lang.String, byte[]> images,
-		java.lang.String articleURL, boolean latestVersion,
+		java.lang.String articleURL, boolean validate,
 		ServiceContext serviceContext) throws PortalException;
 
 	/**
@@ -3327,8 +3327,8 @@ public interface JournalArticleLocalService extends BaseLocalService,
 	* @param images the web content's images (optionally <code>null</code>)
 	* @param articleURL the web content article's accessible URL (optionally
 	<code>null</code>)
-	* @param latestVersion whether the article references and structure fields
-	are validated or not, as it is needed for the latest version only
+	* @param validate whether the article references and structure fields
+	are validated or not
 	* @param serviceContext the service context to be applied. Can set the
 	modification date, expando bridge attributes, asset category IDs,
 	asset tag names, asset link entry IDs, asset priority, workflow
@@ -3355,7 +3355,7 @@ public interface JournalArticleLocalService extends BaseLocalService,
 		int reviewDateHour, int reviewDateMinute, boolean neverReview,
 		boolean indexable, boolean smallImage, java.lang.String smallImageURL,
 		File smallImageFile, Map<java.lang.String, byte[]> images,
-		java.lang.String articleURL, boolean latestVersion,
+		java.lang.String articleURL, boolean validate,
 		ServiceContext serviceContext) throws PortalException;
 
 	/**
@@ -3466,7 +3466,7 @@ public interface JournalArticleLocalService extends BaseLocalService,
 	* @param images the web content's images (optionally <code>null</code>)
 	* @param articleURL the web content article's accessible URL (optionally
 	<code>null</code>)
-	* @param validateReferences whether the article references are validated
+	* @param validate whether the article references are validated
 	or not
 	* @param serviceContext the service context to be applied. Can set the
 	modification date, expando bridge attributes, asset category IDs,
@@ -3493,7 +3493,7 @@ public interface JournalArticleLocalService extends BaseLocalService,
 		int reviewDateHour, int reviewDateMinute, boolean neverReview,
 		boolean indexable, boolean smallImage, java.lang.String smallImageURL,
 		File smallImageFile, Map<java.lang.String, byte[]> images,
-		java.lang.String articleURL, boolean validateReferences,
+		java.lang.String articleURL, boolean validate,
 		ServiceContext serviceContext) throws PortalException;
 
 	/**
