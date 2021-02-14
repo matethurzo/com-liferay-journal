@@ -29,7 +29,9 @@ boolean mergeWithParentFolderDisabled = ParamUtil.getBoolean(request, "mergeWith
 
 boolean rootFolder = ParamUtil.getBoolean(request, "rootFolder");
 
-boolean workflowEnabled = WorkflowEngineManagerUtil.isDeployed() && (WorkflowHandlerRegistryUtil.getWorkflowHandler(JournalArticle.class.getName()) != null);
+Group scopeGroup = GroupLocalServiceUtil.getGroup(scopeGroupId);
+
+boolean workflowEnabled = WorkflowEngineManagerUtil.isDeployed() && (WorkflowHandlerRegistryUtil.getWorkflowHandler(JournalArticle.class.getName()) != null) && !scopeGroup.isLayoutSetPrototype();
 
 List<WorkflowDefinition> workflowDefinitions = null;
 
